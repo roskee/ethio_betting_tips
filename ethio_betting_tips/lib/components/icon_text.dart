@@ -19,7 +19,7 @@ class IconText extends StatelessWidget {
         width: 22,
         height:22,
         padding: EdgeInsets.all(padding),
-        margin: EdgeInsets.all(2),
+        margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
             color: backgroundColor, borderRadius: BorderRadius.circular(50)),
         child: Center(child:Text(text, style: TextStyle(color: textColor))));

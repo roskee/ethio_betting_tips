@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ethio_betting_tips/firebase_options.dart';
 import 'package:ethio_betting_tips/search.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'api.dart';
-import 'components/icon_text.dart';
-import 'components/titled_text.dart';
 import 'match_card.dart';
 
-void main() {
+void main()async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const EthioBettingTips());
 }
 
@@ -33,11 +36,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<MatchTip> matches=[];
-  API api=API();
+  API api=API(FirebaseFirestore.instance);
+  bool isReady = false;
   @override
   void initState(){
     super.initState();
-    matches= api.getAllMatchs();
+    api.getAllMatchs().then((value){
+      setState(() {
+        isReady = true;
+        matches = value;
+      });
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -47,7 +56,7 @@ class _HomePageState extends State<HomePage> {
           actions: [
             // search icon
             IconButton(onPressed: () {
-              Navigator.push(context,MaterialPageRoute(builder: (context)=>const SearchPage()));
+              Navigator.push(context,MaterialPageRoute(builder: (context)=>SearchPage(api: api,)));
             }, icon: const Icon(Icons.search))
           ],
         ),
@@ -67,7 +76,17 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        body: ListView(children: List.generate(matches.length, (index) => MatchCard(match: matches[index]))));
+        body: (isReady)?
+        ListView(children: List.generate(matches.length, (index) => MatchCard(match: matches[index]))
+        )
+        : Center(child:Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children:const [
+            CircularProgressIndicator(),
+            Divider(color: Colors.transparent,),
+            Text('Loading Tips')
+          ]))
+        );
   }
 }
 

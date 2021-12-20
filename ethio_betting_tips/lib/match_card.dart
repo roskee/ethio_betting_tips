@@ -32,9 +32,9 @@ class MatchCard extends StatelessWidget {
                     padding: const EdgeInsets.all(5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center, // dec 12 -17:30
                       children: [
-                        TitledWidget(title: 'time', content: Text(match.time)),
+                        TitledWidget(title: 'time', content: Text("${match.time.month} ${match.time.day} - ${match.time.hour}:${match.time.minute}")),
                         const VerticalDivider(),
                         Expanded(
                             child: Center(

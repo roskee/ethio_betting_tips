@@ -1,7 +1,6 @@
 import 'package:ethio_betting_tips/components/icon_text.dart';
 import 'package:ethio_betting_tips/components/titled_text.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 import 'api.dart';
 
@@ -61,7 +60,7 @@ class MatchScreen extends StatelessWidget {
                           child: SizedBox(
                               height: 30,
                               width: Size.infinite.width,
-                              child: Center(child: Text('Time: ${match.time}')))),
+                              child: Center(child: Text('Time: ${match.time.month}/${match.time.day} - ${match.time.hour}:${match.time.minute}')))),
                       Card(
                           elevation: 0,
                           child: SizedBox(
