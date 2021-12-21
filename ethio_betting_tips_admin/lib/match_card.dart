@@ -1,4 +1,4 @@
-import 'package:ethio_betting_tips/match_screen.dart';
+import 'package:ethio_betting_tips_admin/match_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'api.dart';
