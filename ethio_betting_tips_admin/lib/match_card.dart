@@ -7,9 +7,11 @@ import 'components/titled_text.dart';
 class MatchCard extends StatelessWidget {
   const MatchCard({
     Key? key,
-    required this.match
+    required this.match,
+    required this.api
   }) : super(key: key);
   final MatchTip match;
+  final API api;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +22,7 @@ class MatchCard extends StatelessWidget {
               MaterialPageRoute(
                   builder: (context) =>
                       MatchScreen(
+                        api: api,
                         match: match,
                         )));
         },
@@ -51,6 +54,7 @@ class MatchCard extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => MatchScreen(
+                                      api: api,
                                         match: match)));
                           },
                         )

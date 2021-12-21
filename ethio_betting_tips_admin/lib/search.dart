@@ -39,7 +39,7 @@ class _SearchPageState extends State<SearchPage> {
                       List<MatchCard> temp = [];
                       widget.api.getMatchsForResult(value).then((value) {
                         for (MatchTip matchTip in value) {
-                          temp.add(MatchCard(match: matchTip));
+                          temp.add(MatchCard(api: widget.api,match: matchTip));
                         }
                         setState(() {
                           result = temp;
@@ -67,7 +67,7 @@ class _SearchPageState extends State<SearchPage> {
                           .getMatchsForResult(termController.value.text)
                           .then((value) {
                         for (MatchTip matchTip in value) {
-                          temp.add(MatchCard(match: matchTip));
+                          temp.add(MatchCard(api:widget.api,match: matchTip));
                         }
                         setState(() {
                           if (temp.isEmpty) {

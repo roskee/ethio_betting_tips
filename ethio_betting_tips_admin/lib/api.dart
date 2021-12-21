@@ -34,7 +34,34 @@ class API {
 
   Future<String?> logIn(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return null;
+    } catch (e) {
+      String errorMessage;
+      switch ((e as FirebaseAuthException).code) {
+        case 'user-not-found':
+          errorMessage = 'There is no account with this email';
+          break;
+        case 'invalid-email':
+          errorMessage = 'You have entered an invalid email';
+          break;
+        case 'user-disabled':
+          errorMessage =
+              'The account you tried to login to is currently disabled. contact administrators';
+          break;
+        case 'wrong-password':
+          errorMessage = "The password is incorrect";
+          break;
+        default:
+          errorMessage = 'Unknown Error has occured';
+      }
+      return errorMessage;
+    }
+  }
+
+  Future<String?> createAdmin(String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       return null;
     } catch (e) {
@@ -58,6 +85,10 @@ class API {
       }
       return errorMessage;
     }
+  }
+
+  Future<void> logout() async {
+    await _auth.signOut();
   }
 }
 
