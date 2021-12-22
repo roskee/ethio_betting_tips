@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ethio_betting_tips_admin/firebase_options.dart';
+import 'package:ethio_betting_tips_admin/match_screen.dart';
 import 'package:ethio_betting_tips_admin/search.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -38,17 +39,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<MatchTip> matches = [];
-  final API api = API(FirebaseFirestore.instance, FirebaseAuth.instance);
+  late final API api;
   bool isReady = false, isLoggedIn = false;
-  @override
-  void initState() {
-    super.initState();
+  void reload() {
     api.getAllMatchs().then((value) {
       setState(() {
         isReady = true;
         matches = value;
       });
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    api = API(FirebaseFirestore.instance, FirebaseAuth.instance, reload);
+    reload();
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user == null) {
         setState(() {
@@ -111,15 +117,22 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             floatingActionButton: FloatingActionButton(
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>const AddMatchPage()));
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MatchScreen(
+                              api: api,
+                              match: MatchTip.defaultTip(),
+                              isNew: true,
+                            )));
               },
               child: const Icon(Icons.add),
             ),
             body: (isReady)
                 ? ListView(
                     children: List.generate(matches.length,
-                        (index) => MatchCard(api:api,match: matches[index])))
+                        (index) => MatchCard(api: api, match: matches[index])))
                 : Center(
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

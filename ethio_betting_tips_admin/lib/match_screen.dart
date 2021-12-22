@@ -1,29 +1,45 @@
 import 'package:ethio_betting_tips_admin/components/icon_text.dart';
 import 'package:ethio_betting_tips_admin/components/titled_text.dart';
+import 'package:ethio_betting_tips_admin/components/toggle_widget.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'api.dart';
-
+// TODO: flutter_datetime_picker warning !!!
 class MatchScreen extends StatefulWidget {
-  const MatchScreen({Key? key, required this.api, required this.match})
+  const MatchScreen(
+      {Key? key, required this.api, required this.match, this.isNew = false})
       : super(key: key);
   final MatchTip match;
   final API api;
-
+  final bool isNew;
   @override
   State<MatchScreen> createState() => _MatchScreenState();
 }
 
 class _MatchScreenState extends State<MatchScreen> {
   bool isEditing = false;
-  MatchTip? editableTip;
+  late MatchTip editableTip;
   TextEditingController? homeController, awayController;
   @override
   void initState() {
     super.initState();
     editableTip = widget.match;
-    homeController = TextEditingController(text: editableTip!.home);
-    awayController = TextEditingController(text: editableTip!.away);
+    if (widget.isNew) isEditing = true;
+    homeController = TextEditingController(text: editableTip.home);
+    awayController = TextEditingController(text: editableTip.away);
+  }
+
+  String getDateTimeFormat(DateTime dateTime) {
+    String date = '';
+    date += dateTime.month < 10 ? '0${dateTime.month}' : '${dateTime.month}';
+    date += '/';
+    date += dateTime.day < 10 ? '0${dateTime.day}' : '${dateTime.day}';
+    date += ' - ';
+    date += dateTime.hour < 10 ? '0${dateTime.hour}' : '${dateTime.hour}';
+    date += ':';
+    date += dateTime.minute < 10 ? '0${dateTime.minute}' : '${dateTime.minute}';
+    return date;
   }
 
   Widget iconTextFor(int x) {
@@ -33,7 +49,9 @@ class _MatchScreenState extends State<MatchScreen> {
       case 0:
         return const IconText(text: 'D', backgroundColor: Colors.yellow);
       case 1:
-        return const IconText(text: 'W', backgroundColor: Colors.green);
+        return IconText(
+            text: 'W',
+            backgroundColor: isEditing ? Colors.lightGreen : Colors.green);
       default:
         return const IconText(
           text: ' ',
@@ -51,18 +69,20 @@ class _MatchScreenState extends State<MatchScreen> {
                   setState(() {
                     isEditing = false;
                   });
+                  widget.isNew
+                      ? widget.api.addTip(editableTip)
+                      : widget.api.updateTip(editableTip);
                 },
                 elevation: 10,
                 isExtended: true,
                 backgroundColor: Colors.lightGreen,
                 child: const Text(
                   'Save',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               )
             : FloatingActionButton(
                 onPressed: () {
-                  // TODO: make the page editable
                   setState(() {
                     isEditing = true;
                   });
@@ -71,11 +91,10 @@ class _MatchScreenState extends State<MatchScreen> {
               ),
         appBar: isEditing
             ? AppBar(
-                title: Text('Editing Match...'),
+                title: const Text('Editing Match...'),
                 backgroundColor: Colors.lightGreen,
               )
-            : AppBar(
-                title: Text('${editableTip!.home} VS ${editableTip!.away}')),
+            : AppBar(title: Text('${editableTip.home} VS ${editableTip.away}')),
         body: ListView(children: [
           Card(
               elevation: 3,
@@ -91,120 +110,453 @@ class _MatchScreenState extends State<MatchScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                 Stack(
-                                   alignment: Alignment.topRight,
+                                  Stack(
+                                    alignment: Alignment.topRight,
                                     children: [
                                       TitledWidget(
                                           title: 'Home',
-                                          content: SizedBox( //TODO: try more realistic solution
+                                          content: SizedBox(
                                             width: 140,
                                             child: TextField(
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  editableTip =
+                                                      editableTip.editTip(
+                                                          home: homeController!
+                                                              .value.text);
+                                                  // editableTip = MatchTip(
+                                                  //     homeController!
+                                                  //         .value.text,
+                                                  //     editableTip.away,
+                                                  //     editableTip.time,
+                                                  //     editableTip.winTip,
+                                                  //     editableTip.overUnderTip,
+                                                  //     editableTip.gGTip,
+                                                  //     homeRecord: editableTip
+                                                  //         .homeRecord,
+                                                  //     awayRecord: editableTip
+                                                  //         .awayRecord);
+                                                });
+                                              },
                                               textAlign: TextAlign.center,
                                               controller: homeController,
                                               readOnly: !isEditing,
                                             ),
                                           )),
-                                          Visibility(
-                            visible: isEditing,
-                            child:const Padding(padding:EdgeInsets.all(10),child:Icon(Icons.edit,size:16)))
+                                      Visibility(
+                                          visible: isEditing,
+                                          child: const Padding(
+                                              padding: EdgeInsets.all(10),
+                                              child:
+                                                  Icon(Icons.edit, size: 16)))
                                     ],
                                   ),
                                   const VerticalDivider(),
                                   const Text('VS'),
                                   const VerticalDivider(),
                                   Stack(
-                                    alignment:Alignment.topRight,
+                                    alignment: Alignment.topRight,
                                     children: [
                                       TitledWidget(
                                           title: 'Away',
                                           content: SizedBox(
                                               width: 140,
                                               child: TextField(
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    editableTip =
+                                                        editableTip.editTip(
+                                                            away:
+                                                                awayController!
+                                                                    .value
+                                                                    .text);
+                                                    // editableTip = MatchTip(
+                                                    //     awayController!
+                                                    //         .value.text,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     editableTip.winTip,
+                                                    //     editableTip
+                                                    //         .overUnderTip,
+                                                    //     editableTip.gGTip,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                },
                                                 textAlign: TextAlign.center,
                                                 controller: awayController,
                                                 readOnly: !isEditing,
                                               ))),
-                                              Visibility(
-                            visible: isEditing,
-                            child:const Padding(padding:EdgeInsets.all(10),child:Icon(Icons.edit,size:16)))
+                                      Visibility(
+                                          visible: isEditing,
+                                          child: const Padding(
+                                              padding: EdgeInsets.all(10),
+                                              child:
+                                                  Icon(Icons.edit, size: 16)))
                                     ],
                                   )
                                 ],
                               ))),
                       InkWell(
-                        onTap: isEditing?() {}:null,
-                        child: Stack(
-                          
-                          alignment: Alignment.topRight,
-                          children:[Card(
-                            elevation: 1,
-                            child: SizedBox(
-                                height: 30,
-                                width: Size.infinite.width,
-                                child: Center(
-                                    child: Text(
-                                        'Time: ${editableTip!.time.month}/${editableTip!.time.day} - ${editableTip!.time.hour}:${editableTip!.time.minute}')))),
-                          Visibility(
-                            visible: isEditing,
-                            child:const Padding(padding:EdgeInsets.all(10),child:Icon(Icons.edit,size:16)))
-                          ])
-                      ),
-        
-                     
-                      InkWell(
-                        onTap: isEditing?(){}:null,
-                        child:Stack(
-                          alignment: Alignment.topRight,
-                          children: [
+                          onTap: isEditing
+                              ? () {
+                                  // showDatePicker(
+                                  //         context: context,
+                                  //         initialDate: editableTip.time,
+                                  //         firstDate: DateTime.now(),
+                                  //         lastDate: DateTime(
+                                  //             DateTime.now().year + 1, 6))
+                                  //     .then((date) {
+                                  //   if (date != null) {
+                                  //     //
+                                  //     showTimePicker(
+                                  //             context: context,
+                                  //             initialTime:
+                                  //                 TimeOfDay.fromDateTime(
+                                  //                     editableTip.time))
+                                  //         .then((time) {
+                                  //       if (time != null) {
+                                  //         setState(() {
+                                  //           editableTip = editableTip.editTip(
+                                  //               time: DateTime(
+                                  //                   date.year,
+                                  //                   date.month,
+                                  //                   date.day,
+                                  //                   time.hour,
+                                  //                   time.minute));
+                                  //           // editableTip = MatchTip(
+                                  //           //     editableTip.home,
+                                  //           //     editableTip.away,
+                                  //           //     DateTime(
+                                  //           //         date.year,
+                                  //           //         date.month,
+                                  //           //         date.day,
+                                  //           //         time.hour,
+                                  //           //         time.minute),
+                                  //           //     editableTip.winTip,
+                                  //           //     editableTip.overUnderTip,
+                                  //           //     editableTip.gGTip,
+                                  //           //     homeRecord:
+                                  //           //         editableTip.homeRecord,
+                                  //           //     awayRecord:
+                                  //           //         editableTip.awayRecord);
+                                  //         });
+                                  //       }
+                                  //     });
+                                  //   }
+                                  // });
+                                  //TODO: change time format to local time
+                                  DatePicker.showDateTimePicker(
+                                    context,
+                                    minTime: DateTime.now(),
+                                    currentTime: editableTip.time,
+                                    maxTime:
+                                        DateTime(DateTime.now().year + 1, 6),
+                                    onConfirm: (date) {
+                                      setState(() {
+                                        editableTip =
+                                            editableTip.editTip(time: date);
+                                      });
+                                    },
+                                  );
+                                }
+                              : null,
+                          child:
+                              Stack(alignment: Alignment.topRight, children: [
                             Card(
-                              elevation: 0,
-                              child: SizedBox(
-                                  height: 80,
-                                  child: TitledWidget(
-                                      title: 'Last 5 Matches',
-                                      titleFontSize: 14,
-                                      content: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                                Wrap(
-                                                  children: [
-                                                    iconTextFor(
-                                                        editableTip!.homeRecord[0]),
-                                                    iconTextFor(
-                                                        editableTip!.homeRecord[1]),
-                                                    iconTextFor(
-                                                        editableTip!.homeRecord[2]),
-                                                    iconTextFor(
-                                                        editableTip!.homeRecord[3]),
-                                                    iconTextFor(
-                                                        editableTip!.homeRecord[4])
-                                                  ],
-                                                ),
-                                          const VerticalDivider(
-                                            width: 25,
-                                          ),
-                                          Wrap(
-                                              children: [
-                                                iconTextFor(
-                                                    editableTip!.awayRecord[0]),
-                                                iconTextFor(
-                                                    editableTip!.awayRecord[1]),
-                                                iconTextFor(
-                                                    editableTip!.awayRecord[2]),
-                                                iconTextFor(
-                                                    editableTip!.awayRecord[3]),
-                                                iconTextFor(
-                                                    editableTip!.awayRecord[4]),
-                                              ],
-                                            ),
-                                          
-                                        ],
-                                      )))),
-                                      Visibility(
-                            visible: isEditing,
-                            child:const Padding(padding:EdgeInsets.all(10),child:Icon(Icons.edit,size:16)))
-                          ],
-                        )),
+                                elevation: 1,
+                                child: SizedBox(
+                                    height: 30,
+                                    width: Size.infinite.width,
+                                    child: Center(
+                                        child: Text(
+                                            getDateTimeFormat(editableTip.time))
+                                        //'Time: ${editableTip.time.month}/${editableTip.time.day} - ${editableTip.time.hour}:${editableTip.time.minute}')
+                                        ))),
+                            Visibility(
+                                visible: isEditing,
+                                child: const Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Icon(Icons.edit, size: 16)))
+                          ])),
+                      InkWell(
+                          onTap: isEditing
+                              ? () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) => Dialog(
+                                            child: Card(
+                                                child: SizedBox(
+                                                    height: 300,
+                                                    child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Expanded(
+                                                            child: TitledWidget(
+                                                              title:
+                                                                  'Tap to Change',
+                                                              dividerWidth: 1,
+                                                              titleFontSize: 18,
+                                                              content: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                        flex: 1,
+                                                                        child:
+                                                                            TitledWidget(
+                                                                          title:
+                                                                              editableTip.home,
+                                                                          titleFontSize:
+                                                                              16,
+                                                                          dividerWidth:
+                                                                              1,
+                                                                          content:
+                                                                              Column(
+                                                                            children: [
+                                                                              ToggleWidget(
+                                                                                toggleWidgetList: [
+                                                                                  iconTextFor(-1),
+                                                                                  iconTextFor(0),
+                                                                                  iconTextFor(1)
+                                                                                ],
+                                                                                onToggleChange: (index) {
+                                                                                  List<int> temp = List.from(editableTip.homeRecord);
+                                                                                  temp.replaceRange(0, 1, [
+                                                                                    index - 1
+                                                                                  ]);
+                                                                                  setState(() {
+                                                                                    editableTip = editableTip.editTip(homeRecord: temp);
+                                                                                  });
+                                                                                },
+                                                                                valueIndex: editableTip.homeRecord[0] + 1,
+                                                                              ),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.homeRecord);
+                                                                                    temp.replaceRange(1, 2, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(homeRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.homeRecord[1] + 1),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.homeRecord);
+                                                                                    temp.replaceRange(2, 3, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(homeRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.homeRecord[2] + 1),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.homeRecord);
+                                                                                    temp.replaceRange(3, 4, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(homeRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.homeRecord[3] + 1),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.homeRecord);
+                                                                                    temp.replaceRange(4, 5, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(homeRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.homeRecord[4] + 1)
+                                                                            ],
+                                                                          ),
+                                                                        )),
+                                                                    const VerticalDivider(),
+                                                                    Expanded(
+                                                                        flex: 1,
+                                                                        child: TitledWidget(
+                                                                            title: editableTip.away,
+                                                                            titleFontSize: 16,
+                                                                            dividerWidth: 1,
+                                                                            content: Column(children: [
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.awayRecord);
+                                                                                    temp.replaceRange(0, 1, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(awayRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.awayRecord[0] + 1),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.awayRecord);
+                                                                                    temp.replaceRange(1, 2, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(awayRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.awayRecord[1] + 1),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.awayRecord);
+                                                                                    temp.replaceRange(2, 3, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(awayRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.awayRecord[2] + 1),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.awayRecord);
+                                                                                    temp.replaceRange(3, 4, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(awayRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.awayRecord[3] + 1),
+                                                                              ToggleWidget(
+                                                                                  toggleWidgetList: [
+                                                                                    iconTextFor(-1),
+                                                                                    iconTextFor(0),
+                                                                                    iconTextFor(1)
+                                                                                  ],
+                                                                                  onToggleChange: (index) {
+                                                                                    List<int> temp = List.from(editableTip.awayRecord);
+                                                                                    temp.replaceRange(4, 5, [
+                                                                                      index - 1
+                                                                                    ]);
+                                                                                    setState(() {
+                                                                                      editableTip = editableTip.editTip(awayRecord: temp);
+                                                                                    });
+                                                                                  },
+                                                                                  valueIndex: editableTip.awayRecord[4] + 1)
+                                                                            ])))
+                                                                  ]),
+                                                            ),
+                                                          ),
+                                                          TextButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
+                                                              child: const Text(
+                                                                  'OK'))
+                                                        ]))),
+                                          ));
+                                }
+                              : null,
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Card(
+                                  elevation: 0,
+                                  child: SizedBox(
+                                      height: 80,
+                                      child: TitledWidget(
+                                          title: 'Last 5 Matches',
+                                          titleFontSize: 14,
+                                          content: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Wrap(
+                                                children: [
+                                                  iconTextFor(editableTip
+                                                      .homeRecord[0]),
+                                                  iconTextFor(editableTip
+                                                      .homeRecord[1]),
+                                                  iconTextFor(editableTip
+                                                      .homeRecord[2]),
+                                                  iconTextFor(editableTip
+                                                      .homeRecord[3]),
+                                                  iconTextFor(
+                                                      editableTip.homeRecord[4])
+                                                ],
+                                              ),
+                                              const VerticalDivider(
+                                                width: 25,
+                                              ),
+                                              Wrap(
+                                                children: [
+                                                  iconTextFor(editableTip
+                                                      .awayRecord[0]),
+                                                  iconTextFor(editableTip
+                                                      .awayRecord[1]),
+                                                  iconTextFor(editableTip
+                                                      .awayRecord[2]),
+                                                  iconTextFor(editableTip
+                                                      .awayRecord[3]),
+                                                  iconTextFor(editableTip
+                                                      .awayRecord[4]),
+                                                ],
+                                              ),
+                                            ],
+                                          )))),
+                              Visibility(
+                                  visible: isEditing,
+                                  child: const Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Icon(Icons.edit, size: 16)))
+                            ],
+                          )),
                     ],
                   ))),
           Container(
@@ -231,22 +583,40 @@ class _MatchScreenState extends State<MatchScreen> {
                                 title: '1X2',
                                 titleFontSize: 14,
                                 content: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Expanded(
                                         flex: 1,
                                         child: InkResponse(
-                                           splashColor: Colors.transparent,
+                                          splashColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
-                                          onTap: isEditing?(){
-                                            setState(() {
-                                              editableTip=MatchTip(editableTip!.home, editableTip!.away, editableTip!.time, 1, editableTip!.overUnderTip, editableTip!.gGTip,homeRecord: editableTip!.homeRecord,awayRecord: editableTip!.awayRecord);
-                                            });
-                                          }:null,
+                                          onTap: isEditing
+                                              ? () {
+                                                  setState(() {
+                                                    editableTip = editableTip
+                                                        .editTip(winTip: 1);
+                                                    // editableTip = MatchTip(
+                                                    //     editableTip.home,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     1,
+                                                    //     editableTip
+                                                    //         .overUnderTip,
+                                                    //     editableTip.gGTip,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                }
+                                              : null,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: editableTip!.winTip == 1
-                                                      ? Colors.green
+                                                  color: editableTip.winTip == 1
+                                                      ? isEditing
+                                                          ? Colors.lightGreen
+                                                          : Colors.green
                                                       : Colors.white,
                                                   boxShadow: const [
                                                     BoxShadow(
@@ -255,34 +625,10 @@ class _MatchScreenState extends State<MatchScreen> {
                                                         blurRadius: 1)
                                                   ],
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
-                                              child: const Center(child: Text('1'))),
-                                        )),
-                                    const VerticalDivider(),
-                                    Expanded(
-                                        flex: 1,
-                                        child: InkResponse(
-                                           splashColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          onTap: isEditing?(){
-                                            setState(() {
-                                              editableTip=MatchTip(editableTip!.home, editableTip!.away, editableTip!.time, 0, editableTip!.overUnderTip, editableTip!.gGTip,homeRecord: editableTip!.homeRecord,awayRecord: editableTip!.awayRecord);
-                                            });
-                                          }:null,
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: editableTip!.winTip == 0
-                                                      ? Colors.green
-                                                      : Colors.white,
-                                                  boxShadow: const [
-                                                    BoxShadow(
-                                                        color: Colors.grey,
-                                                        offset: Offset(1, 1),
-                                                        blurRadius: 1)
-                                                  ],
-                                                  borderRadius:
-                                                      BorderRadius.circular(10)),
-                                              child: const Center(child: Text('X'))),
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: const Center(
+                                                  child: Text('1'))),
                                         )),
                                     const VerticalDivider(),
                                     Expanded(
@@ -290,15 +636,32 @@ class _MatchScreenState extends State<MatchScreen> {
                                         child: InkResponse(
                                           splashColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
-                                          onTap: isEditing ? (){
-                                            setState(() {
-                                              editableTip=MatchTip(editableTip!.home, editableTip!.away, editableTip!.time, 2, editableTip!.overUnderTip, editableTip!.gGTip,homeRecord: editableTip!.homeRecord,awayRecord: editableTip!.awayRecord);
-                                            });
-                                          }:null,
+                                          onTap: isEditing
+                                              ? () {
+                                                  setState(() {
+                                                    editableTip = editableTip
+                                                        .editTip(winTip: 0);
+                                                    // editableTip = MatchTip(
+                                                    //     editableTip.home,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     0,
+                                                    //     editableTip
+                                                    //         .overUnderTip,
+                                                    //     editableTip.gGTip,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                }
+                                              : null,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: editableTip!.winTip == 2
-                                                      ? Colors.green
+                                                  color: editableTip.winTip == 0
+                                                      ? isEditing
+                                                          ? Colors.lightGreen
+                                                          : Colors.green
                                                       : Colors.white,
                                                   boxShadow: const [
                                                     BoxShadow(
@@ -307,13 +670,61 @@ class _MatchScreenState extends State<MatchScreen> {
                                                         blurRadius: 1)
                                                   ],
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
-                                              child: const Center(child: Text('2'))),
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: const Center(
+                                                  child: Text('X'))),
+                                        )),
+                                    const VerticalDivider(),
+                                    Expanded(
+                                        flex: 1,
+                                        child: InkResponse(
+                                          splashColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: isEditing
+                                              ? () {
+                                                  setState(() {
+                                                    editableTip = editableTip
+                                                        .editTip(winTip: 2);
+                                                    // editableTip = MatchTip(
+                                                    //     editableTip.home,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     2,
+                                                    //     editableTip
+                                                    //         .overUnderTip,
+                                                    //     editableTip.gGTip,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                }
+                                              : null,
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: editableTip.winTip == 2
+                                                      ? isEditing
+                                                          ? Colors.lightGreen
+                                                          : Colors.green
+                                                      : Colors.white,
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                        color: Colors.grey,
+                                                        offset: Offset(1, 1),
+                                                        blurRadius: 1)
+                                                  ],
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: const Center(
+                                                  child: Text('2'))),
                                         ))
                                   ],
                                 ),
                               )),
                         ),
+                        // TODO: Over under must have all other choices for editing and adding a matchTip
                         Card(
                           elevation: 3,
                           margin: const EdgeInsets.all(10),
@@ -324,22 +735,47 @@ class _MatchScreenState extends State<MatchScreen> {
                                 title: 'Over/Under',
                                 titleFontSize: 14,
                                 content: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Expanded(
                                         flex: 1,
                                         child: InkResponse(
                                           splashColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
-                                          onTap: isEditing?(){
-                                              setState(() {
-                                              editableTip=MatchTip(editableTip!.home, editableTip!.away, editableTip!.time, editableTip!.winTip, editableTip!.overUnderTip.abs(), editableTip!.gGTip,homeRecord: editableTip!.homeRecord,awayRecord: editableTip!.awayRecord);
-                                            });
-                                          }:null,
+                                          onTap: isEditing
+                                              ? () {
+                                                  setState(() {
+                                                    editableTip =
+                                                        editableTip.editTip(
+                                                      overUnderTip: editableTip
+                                                          .overUnderTip
+                                                          .abs(),
+                                                    );
+                                                    // editableTip = MatchTip(
+                                                    //     editableTip.home,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     editableTip.winTip,
+                                                    //     editableTip
+                                                    //         .overUnderTip
+                                                    //         .abs(),
+                                                    //     editableTip.gGTip,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                }
+                                              : null,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: editableTip!.overUnderTip > 0
-                                                      ? Colors.green
+                                                  color: editableTip
+                                                              .overUnderTip >
+                                                          0
+                                                      ? isEditing
+                                                          ? Colors.lightGreen
+                                                          : Colors.green
                                                       : Colors.white,
                                                   boxShadow: const [
                                                     BoxShadow(
@@ -348,26 +784,53 @@ class _MatchScreenState extends State<MatchScreen> {
                                                         blurRadius: 1)
                                                   ],
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
+                                                      BorderRadius.circular(
+                                                          10)),
                                               child: Center(
                                                   child: Text(
-                                                      'Over ${(editableTip!.overUnderTip.abs())}'))),
+                                                      'Over ${(editableTip.overUnderTip.abs())}'))),
                                         )),
                                     const VerticalDivider(),
                                     Expanded(
                                         flex: 1,
                                         child: InkResponse(
-                                           splashColor: Colors.transparent,
+                                          splashColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
-                                          onTap: isEditing?(){
-                                            setState(() {
-                                              editableTip=MatchTip(editableTip!.home, editableTip!.away, editableTip!.time, editableTip!.winTip, editableTip!.overUnderTip.abs()*-1, editableTip!.gGTip,homeRecord: editableTip!.homeRecord,awayRecord: editableTip!.awayRecord);
-                                            });
-                                          }:null,
+                                          onTap: isEditing
+                                              ? () {
+                                                  setState(() {
+                                                    editableTip =
+                                                        editableTip.editTip(
+                                                      overUnderTip: editableTip
+                                                              .overUnderTip
+                                                              .abs() *
+                                                          -1,
+                                                    );
+                                                    // editableTip = MatchTip(
+                                                    //     editableTip.home,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     editableTip.winTip,
+                                                    //     editableTip
+                                                    //             .overUnderTip
+                                                    //             .abs() *
+                                                    //         -1,
+                                                    //     editableTip.gGTip,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                }
+                                              : null,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: editableTip!.overUnderTip < 0
-                                                      ? Colors.green
+                                                  color: editableTip
+                                                              .overUnderTip <
+                                                          0
+                                                      ? isEditing
+                                                          ? Colors.lightGreen
+                                                          : Colors.green
                                                       : Colors.white,
                                                   boxShadow: const [
                                                     BoxShadow(
@@ -376,11 +839,12 @@ class _MatchScreenState extends State<MatchScreen> {
                                                         blurRadius: 1)
                                                   ],
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
+                                                      BorderRadius.circular(
+                                                          10)),
                                               //color: Colors.green,
                                               child: Center(
                                                   child: Text(
-                                                      'Under ${editableTip!.overUnderTip.abs()}'))),
+                                                      'Under ${editableTip.overUnderTip.abs()}'))),
                                         )),
                                   ],
                                 ),
@@ -396,23 +860,41 @@ class _MatchScreenState extends State<MatchScreen> {
                                 title: 'Both Teams to Score',
                                 titleFontSize: 14,
                                 content: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Expanded(
                                         flex: 1,
                                         child: InkResponse(
-                                           splashColor: Colors.transparent,
+                                          splashColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
-                                          onTap: isEditing?(){
-                                            setState(() {
-                                              editableTip=MatchTip(editableTip!.home, editableTip!.away, editableTip!.time, editableTip!.winTip, editableTip!.overUnderTip,false,homeRecord: editableTip!.homeRecord,awayRecord: editableTip!.awayRecord);
-                                            });
-                                          }:null,
+                                          onTap: isEditing
+                                              ? () {
+                                                  setState(() {
+                                                    editableTip = editableTip
+                                                        .editTip(gGTip: false);
+                                                    // editableTip = MatchTip(
+                                                    //     editableTip.home,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     editableTip.winTip,
+                                                    //     editableTip
+                                                    //         .overUnderTip,
+                                                    //     false,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                }
+                                              : null,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: editableTip!.gGTip
+                                                  color: editableTip.gGTip
                                                       ? Colors.white
-                                                      : Colors.green,
+                                                      : isEditing
+                                                          ? Colors.lightGreen
+                                                          : Colors.green,
                                                   boxShadow: const [
                                                     BoxShadow(
                                                         color: Colors.grey,
@@ -420,26 +902,44 @@ class _MatchScreenState extends State<MatchScreen> {
                                                         blurRadius: 1)
                                                   ],
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
+                                                      BorderRadius.circular(
+                                                          10)),
                                               //color: Colors.green,
-                                              child:
-                                                  const Center(child: Text('No'))),
+                                              child: const Center(
+                                                  child: Text('No'))),
                                         )),
                                     const VerticalDivider(),
                                     Expanded(
                                         flex: 1,
                                         child: InkResponse(
-                                           splashColor: Colors.transparent,
+                                          splashColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
-                                          onTap: isEditing?(){
-                                            setState(() {
-                                              editableTip=MatchTip(editableTip!.home, editableTip!.away, editableTip!.time, editableTip!.winTip, editableTip!.overUnderTip,true,homeRecord: editableTip!.homeRecord,awayRecord: editableTip!.awayRecord);
-                                            });
-                                          }:null,
+                                          onTap: isEditing
+                                              ? () {
+                                                  setState(() {
+                                                    editableTip = editableTip
+                                                        .editTip(gGTip: true);
+                                                    // editableTip = MatchTip(
+                                                    //     editableTip.home,
+                                                    //     editableTip.away,
+                                                    //     editableTip.time,
+                                                    //     editableTip.winTip,
+                                                    //     editableTip
+                                                    //         .overUnderTip,
+                                                    //     true,
+                                                    //     homeRecord: editableTip
+                                                    //         .homeRecord,
+                                                    //     awayRecord: editableTip
+                                                    //         .awayRecord);
+                                                  });
+                                                }
+                                              : null,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: editableTip!.gGTip
-                                                      ? Colors.green
+                                                  color: editableTip.gGTip
+                                                      ? isEditing
+                                                          ? Colors.lightGreen
+                                                          : Colors.green
                                                       : Colors.white,
                                                   boxShadow: const [
                                                     BoxShadow(
@@ -448,19 +948,22 @@ class _MatchScreenState extends State<MatchScreen> {
                                                         blurRadius: 1)
                                                   ],
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
+                                                      BorderRadius.circular(
+                                                          10)),
                                               //color: Colors.green,
-                                              child:
-                                                  const Center(child: Text('Yes'))),
+                                              child: const Center(
+                                                  child: Text('Yes'))),
                                         )),
                                   ],
                                 ),
                               )),
                         ),
                       ])),
-                      Visibility(
-                            visible: isEditing,
-                            child:const Padding(padding:EdgeInsets.all(10),child:Icon(Icons.edit,size:16)))
+                  Visibility(
+                      visible: isEditing,
+                      child: const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Icon(Icons.edit, size: 16)))
                 ],
               ))
         ]));

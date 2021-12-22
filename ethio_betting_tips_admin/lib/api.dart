@@ -1,24 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 
 class API {
   final FirebaseFirestore _instance;
   final FirebaseAuth _auth;
-  API(this._instance, this._auth);
+  final VoidCallback onUpdate;
+  API(this._instance, this._auth, this.onUpdate);
   Future<List<MatchTip>> getAllMatchs() async {
     List<MatchTip> temp = [];
-    QuerySnapshot<Map<String, dynamic>> docs =
-        await _instance.collection('Tips').get();
+    QuerySnapshot<Map<String, dynamic>> docs = await _instance
+        .collection('Tips')
+        .where('time', isGreaterThan: DateTime.now())
+        .get();
     for (var element in docs.docs) {
-      temp.add(MatchTip.fromMap(element.data()));
+      temp.add(MatchTip.fromMap(element.id, element.data()));
     }
     return temp;
   }
 
   Future<List<MatchTip>> getMatchsForResult(String term) async {
     List<MatchTip> temp = [];
-    QuerySnapshot<Map<String, dynamic>> docs =
-        await _instance.collection('Tips').get();
+    QuerySnapshot<Map<String, dynamic>> docs = await _instance
+        .collection('Tips')
+        .where('time', isGreaterThan: DateTime.now())
+        .get();
     for (var element in docs.docs) {
       if ((element.data()['home'] as String)
               .toLowerCase()
@@ -26,10 +32,20 @@ class API {
           (element.data()['away'] as String)
               .toLowerCase()
               .contains(term.toLowerCase())) {
-        temp.add(MatchTip.fromMap(element.data()));
+        temp.add(MatchTip.fromMap(element.id, element.data()));
       }
     }
     return temp;
+  }
+
+  Future<void> updateTip(MatchTip tip) async {
+    await _instance.collection('Tips').doc(tip.id).update(tip.toMap());
+    onUpdate();
+  }
+
+  Future<void> addTip(MatchTip tip) async {
+    await _instance.collection('Tips').add(tip.toMap());
+    onUpdate();
   }
 
   Future<String?> logIn(String email, String password) async {
@@ -93,10 +109,22 @@ class API {
 }
 
 class MatchTip {
+  MatchTip.defaultTip() {
+    home = 'HomeTeam';
+    away = 'AwayTeam';
+    time = DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
+    homeRecord = [-1, -1, -1, -1, -1];
+    awayRecord = [-1, -1, -1, -1, -1];
+    winTip = 0;
+    overUnderTip = 0.5;
+    gGTip = false;
+  }
   MatchTip(this.home, this.away, this.time, this.winTip, this.overUnderTip,
       this.gGTip,
       {this.homeRecord = const [-2, -2, -2, -2, -2],
-      this.awayRecord = const [-2, -2, -2, -2, -2]});
+      this.awayRecord = const [-2, -2, -2, -2, -2],
+      this.id});
   late final String home;
   late final String away;
   late final DateTime time;
@@ -105,7 +133,29 @@ class MatchTip {
   late final int winTip;
   late final double overUnderTip;
   late final bool gGTip;
-  MatchTip.fromMap(Map<String, dynamic> map) {
+  String? id;
+  MatchTip editTip(
+      {String? home,
+      String? away,
+      DateTime? time,
+      int? winTip,
+      double? overUnderTip,
+      bool? gGTip,
+      List<int>? homeRecord,
+      List<int>? awayRecord}) {
+    return MatchTip(
+        home ?? this.home,
+        away ?? this.away,
+        time ?? this.time,
+        winTip ?? this.winTip,
+        overUnderTip ?? this.overUnderTip,
+        gGTip ?? this.gGTip,
+        homeRecord: homeRecord ?? this.homeRecord,
+        awayRecord: awayRecord ?? this.awayRecord,
+        id: id);
+  }
+
+  MatchTip.fromMap(this.id, Map<String, dynamic> map) {
     home = map['home'];
     away = map['away'];
     time = (map['time'] as Timestamp).toDate();
@@ -114,5 +164,17 @@ class MatchTip {
     winTip = map['winTip'];
     overUnderTip = map['overUnderTip'];
     gGTip = map['gGTip'];
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'home': home,
+      'away': away,
+      'time': Timestamp.fromDate(time),
+      'homeRecord': homeRecord,
+      'awayRecord': awayRecord,
+      'winTip': winTip,
+      'overUnderTip': overUnderTip,
+      'gGTip': gGTip
+    };
   }
 }
