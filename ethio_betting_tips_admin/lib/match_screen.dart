@@ -188,6 +188,7 @@ class _MatchScreenState extends State<MatchScreen> {
                                                 textAlign: TextAlign.center,
                                                 controller: homeController,
                                                 readOnly: !isEditing,
+                                                maxLines: 2,
                                               ),
                                             )),
                                         Visibility(

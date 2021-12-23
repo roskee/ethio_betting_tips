@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 import 'api.dart';
 
 class MatchScreen extends StatelessWidget {
-  const MatchScreen(
-      {Key? key,
-      required this.match})
-      : super(key: key);
+  const MatchScreen({Key? key, required this.match}) : super(key: key);
   final MatchTip match;
 
   Widget iconTextFor(int x) {
@@ -30,7 +27,9 @@ class MatchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('${match.home} VS ${match.away}')),
+        appBar: AppBar(
+            title: Text('${match.home} - ${match.away}',
+                style: const TextStyle(fontSize: 18))),
         body: ListView(children: [
           Card(
               elevation: 3,
@@ -49,7 +48,7 @@ class MatchScreen extends StatelessWidget {
                                   TitledWidget(
                                       title: 'Home', content: Text(match.home)),
                                   const VerticalDivider(),
-                                  const Text('VS'),
+                                  const Text('-'),
                                   const VerticalDivider(),
                                   TitledWidget(
                                       title: 'Away', content: Text(match.away))
@@ -60,7 +59,9 @@ class MatchScreen extends StatelessWidget {
                           child: SizedBox(
                               height: 30,
                               width: Size.infinite.width,
-                              child: Center(child: Text('Time: ${match.time.month}/${match.time.day} - ${match.time.hour}:${match.time.minute}')))),
+                              child: Center(
+                                  child: Text(
+                                      'Time: ${match.time.month}/${match.time.day} - ${match.time.hour}:${match.time.minute}')))),
                       Card(
                           elevation: 0,
                           child: SizedBox(
@@ -189,7 +190,9 @@ class MatchScreen extends StatelessWidget {
                                     flex: 1,
                                     child: Container(
                                         decoration: BoxDecoration(
-                                            color: match.overUnderTip>0?Colors.green: Colors.white,
+                                            color: match.overUnderTip > 0
+                                                ? Colors.green
+                                                : Colors.white,
                                             boxShadow: const [
                                               BoxShadow(
                                                   color: Colors.grey,
@@ -206,7 +209,9 @@ class MatchScreen extends StatelessWidget {
                                     flex: 1,
                                     child: Container(
                                         decoration: BoxDecoration(
-                                            color: match.overUnderTip<0?Colors.green:Colors.white,
+                                            color: match.overUnderTip < 0
+                                                ? Colors.green
+                                                : Colors.white,
                                             boxShadow: const [
                                               BoxShadow(
                                                   color: Colors.grey,

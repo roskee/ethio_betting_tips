@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'api.dart';
 import 'match_card.dart';
 
-void main()async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const EthioBettingTips());
@@ -35,19 +35,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<MatchTip> matches=[];
-  API api=API(FirebaseFirestore.instance);
+  List<MatchTip> matches = [];
+  API api = API(FirebaseFirestore.instance);
   bool isReady = false;
-  @override
-  void initState(){
-    super.initState();
-    api.getAllMatchs().then((value){
-      setState(() {
-        isReady = true;
-        matches = value;
-      });
+  Future<void> reload() async {
+    List<MatchTip> temp = await api.getAllMatchs();
+    setState(() {
+      isReady = true;
+      matches = temp;
     });
   }
+
+  @override
+  void initState() {
+    super.initState();
+    reload();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,38 +59,85 @@ class _HomePageState extends State<HomePage> {
           title: const Text("Ethio Betting Tips"),
           actions: [
             // search icon
-            IconButton(onPressed: () {
-              Navigator.push(context,MaterialPageRoute(builder: (context)=>SearchPage(api: api,)));
-            }, icon: const Icon(Icons.search))
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchPage(
+                                api: api,
+                              )));
+                },
+                icon: const Icon(Icons.search))
           ],
         ),
         drawer: Drawer(
           child: ListView(
-            children: const [
+            children: [
               SizedBox(
                   height: 200,
-                  child: Center(child: Text('Ethio Betting Tips'))),
+                  child: Center(
+                      child:
+                          Stack(alignment: Alignment.bottomCenter, children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 30),
+                        child: SizedBox(
+                            height: 150,
+                            child: Image.asset(
+                              'ethio_betting_tips2048.png',
+                              fit: BoxFit.fitHeight,
+                            ))),
+                    Text('Ethio Betting Tips', style: TextStyle(fontSize: 16))
+                  ]))),
+              //TODO: should be done upon release
+              // ListTile(
+              //   title: Text('Send Feedback'),
+              // ),
+              // ListTile(
+              //   title: Text('Rate App'),
+              // ),
               ListTile(
-                title: Text('Send Feedback'),
-              ),
-              ListTile(
-                title: Text('Rate App'),
-              ),
-              ListTile(title: Text('About'))
+                leading: Icon(Icons.person),
+                title: Text('About'),
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                              title: Text('About Developer'),
+                              content: SelectableText(
+                                'Hi, I am Kirubel Adamu. I developed this simple application for you football fans out there who want to get daily tips for reference.\n\nEmail:kirubeladamu@gmail.com',
+                                textAlign: TextAlign.justify,
+                              ),
+                              actions: [
+                                TextButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    })
+                              ]));
+                },
+              )
             ],
           ),
         ),
-        body: (isReady)?
-        ListView(children: List.generate(matches.length, (index) => MatchCard(match: matches[index]))
-        )
-        : Center(child:Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:const [
-            CircularProgressIndicator(),
-            Divider(color: Colors.transparent,),
-            Text('Loading Tips')
-          ]))
-        );
+        body: (isReady)
+            ? RefreshIndicator(
+                child: ListView(
+                    children: List.generate(matches.length,
+                        (index) => MatchCard(match: matches[index]))),
+                onRefresh: () async {
+                  await reload();
+                },
+              )
+            : Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                    CircularProgressIndicator(),
+                    Divider(
+                      color: Colors.transparent,
+                    ),
+                    Text('Loading Tips')
+                  ])));
   }
 }
-
