@@ -44,9 +44,15 @@ class API {
     onUpdate();
   }
 
-  Future<void> addTip(MatchTip tip) async {
-    await _instance.collection('Tips').add(tip.toMap());
+  Future<void> deleteTip(MatchTip tip) async {
+    await _instance.collection('Tips').doc(tip.id).delete();
     onUpdate();
+  }
+
+  Future<String> addTip(MatchTip tip) async {
+    DocumentReference x = await _instance.collection('Tips').add(tip.toMap());
+    onUpdate();
+    return x.id;
   }
 
   Future<String?> logIn(String email, String password) async {
@@ -136,7 +142,8 @@ class MatchTip {
   late final bool gGTip;
   String? id;
   MatchTip editTip(
-      {String? home,
+      {String? id,
+      String? home,
       String? away,
       DateTime? time,
       int? winTip,
@@ -153,7 +160,7 @@ class MatchTip {
         gGTip ?? this.gGTip,
         homeRecord: homeRecord ?? this.homeRecord,
         awayRecord: awayRecord ?? this.awayRecord,
-        id: id);
+        id: id ?? this.id);
   }
 
   MatchTip.fromMap(this.id, Map<String, dynamic> map) {
