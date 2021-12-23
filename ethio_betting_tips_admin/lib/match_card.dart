@@ -5,11 +5,8 @@ import 'api.dart';
 import 'components/titled_text.dart';
 
 class MatchCard extends StatelessWidget {
-  const MatchCard({
-    Key? key,
-    required this.match,
-    required this.api
-  }) : super(key: key);
+  const MatchCard({Key? key, required this.match, required this.api})
+      : super(key: key);
   final MatchTip match;
   final API api;
 
@@ -20,32 +17,37 @@ class MatchCard extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      MatchScreen(
+                  builder: (context) => MatchScreen(
                         api: api,
                         match: match,
-                        )));
+                      )));
         },
         child: Card(
             elevation: 10,
             margin: const EdgeInsets.all(5),
             child: SizedBox(
-                height: 50,
+                height: 60,
                 child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center, // dec 12 -17:30
+                      crossAxisAlignment:
+                          CrossAxisAlignment.center, // dec 12 -17:30
                       children: [
-                        TitledWidget(title: 'time', content: Text("${match.time.month}/${match.time.day} - ${match.time.hour}:${match.time.minute}")),
+                        TitledWidget(
+                            title: 'time',
+                            content: Text(
+                                "${match.time.month}/${match.time.day} - ${match.time.hour}:${match.time.minute}")),
                         const VerticalDivider(),
                         Expanded(
                             child: Center(
                                 child: TitledWidget(
                                     title: 'match',
-                                    content: Text('${match.home} VS ${match.away}')))),
+                                    content: Text(
+                                        '${match.home} - ${match.away}')))),
                         const VerticalDivider(),
-                        TitledWidget(title: 'win', content: Text('${match.winTip}')),
+                        TitledWidget(
+                            title: 'win', content: Text('${match.winTip}')),
                         const VerticalDivider(),
                         TextButton(
                           child: const Text('More'),
@@ -53,9 +55,8 @@ class MatchCard extends StatelessWidget {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MatchScreen(
-                                      api: api,
-                                        match: match)));
+                                    builder: (context) =>
+                                        MatchScreen(api: api, match: match)));
                           },
                         )
                       ],

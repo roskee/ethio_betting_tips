@@ -171,19 +171,6 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                 awayController!
                                                                     .value
                                                                     .text);
-                                                    // editableTip = MatchTip(
-                                                    //     awayController!
-                                                    //         .value.text,
-                                                    //     editableTip.away,
-                                                    //     editableTip.time,
-                                                    //     editableTip.winTip,
-                                                    //     editableTip
-                                                    //         .overUnderTip,
-                                                    //     editableTip.gGTip,
-                                                    //     homeRecord: editableTip
-                                                    //         .homeRecord,
-                                                    //     awayRecord: editableTip
-                                                    //         .awayRecord);
                                                   });
                                                 },
                                                 textAlign: TextAlign.center,
@@ -203,52 +190,6 @@ class _MatchScreenState extends State<MatchScreen> {
                       InkWell(
                           onTap: isEditing
                               ? () {
-                                  // showDatePicker(
-                                  //         context: context,
-                                  //         initialDate: editableTip.time,
-                                  //         firstDate: DateTime.now(),
-                                  //         lastDate: DateTime(
-                                  //             DateTime.now().year + 1, 6))
-                                  //     .then((date) {
-                                  //   if (date != null) {
-                                  //     //
-                                  //     showTimePicker(
-                                  //             context: context,
-                                  //             initialTime:
-                                  //                 TimeOfDay.fromDateTime(
-                                  //                     editableTip.time))
-                                  //         .then((time) {
-                                  //       if (time != null) {
-                                  //         setState(() {
-                                  //           editableTip = editableTip.editTip(
-                                  //               time: DateTime(
-                                  //                   date.year,
-                                  //                   date.month,
-                                  //                   date.day,
-                                  //                   time.hour,
-                                  //                   time.minute));
-                                  //           // editableTip = MatchTip(
-                                  //           //     editableTip.home,
-                                  //           //     editableTip.away,
-                                  //           //     DateTime(
-                                  //           //         date.year,
-                                  //           //         date.month,
-                                  //           //         date.day,
-                                  //           //         time.hour,
-                                  //           //         time.minute),
-                                  //           //     editableTip.winTip,
-                                  //           //     editableTip.overUnderTip,
-                                  //           //     editableTip.gGTip,
-                                  //           //     homeRecord:
-                                  //           //         editableTip.homeRecord,
-                                  //           //     awayRecord:
-                                  //           //         editableTip.awayRecord);
-                                  //         });
-                                  //       }
-                                  //     });
-                                  //   }
-                                  // });
-                                  //TODO: change time format to local time
                                   DatePicker.showDateTimePicker(
                                     context,
                                     minTime: DateTime.now(),

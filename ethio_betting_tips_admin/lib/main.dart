@@ -40,12 +40,11 @@ class _HomePageState extends State<HomePage> {
   List<MatchTip> matches = [];
   late final API api;
   bool isReady = false, isLoggedIn = false;
-  void reload() {
-    api.getAllMatchs().then((value) {
-      setState(() {
-        isReady = true;
-        matches = value;
-      });
+  Future<void> reload() async {
+    List<MatchTip> temp = await api.getAllMatchs();
+    setState(() {
+      isReady = true;
+      matches = temp;
     });
   }
 
@@ -129,9 +128,16 @@ class _HomePageState extends State<HomePage> {
               child: const Icon(Icons.add),
             ),
             body: (isReady)
-                ? ListView(
-                    children: List.generate(matches.length,
-                        (index) => MatchCard(api: api, match: matches[index])))
+                ? RefreshIndicator(
+                    child: ListView(
+                        children: List.generate(
+                            matches.length,
+                            (index) =>
+                                MatchCard(api: api, match: matches[index]))),
+                    onRefresh: () async {
+                      await reload();
+                    },
+                  )
                 : Center(
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

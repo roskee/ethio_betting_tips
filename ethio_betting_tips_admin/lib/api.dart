@@ -12,6 +12,7 @@ class API {
     QuerySnapshot<Map<String, dynamic>> docs = await _instance
         .collection('Tips')
         .where('time', isGreaterThan: DateTime.now())
+        .orderBy('time')
         .get();
     for (var element in docs.docs) {
       temp.add(MatchTip.fromMap(element.id, element.data()));
