@@ -5,6 +5,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'api.dart';
+
 // TODO: flutter_datetime_picker warning !!!
 class MatchScreen extends StatefulWidget {
   const MatchScreen(
@@ -560,7 +561,7 @@ class _MatchScreenState extends State<MatchScreen> {
                     ],
                   ))),
           Container(
-              height: 300,
+              height: 500,
               margin: const EdgeInsets.all(10),
               decoration: const BoxDecoration(color: Colors.white, boxShadow: [
                 BoxShadow(
@@ -572,7 +573,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   TitledWidget(
                       title: 'Tips',
                       titleFontSize: 14,
-                      content: ListView(children: [
+                      content: Column(children: [
                         Card(
                           elevation: 3,
                           margin: const EdgeInsets.all(10),
@@ -724,128 +725,133 @@ class _MatchScreenState extends State<MatchScreen> {
                                 ),
                               )),
                         ),
-                        // TODO: Over under must have all other choices for editing and adding a matchTip
                         Card(
                           elevation: 3,
                           margin: const EdgeInsets.all(10),
                           child: Container(
                               padding: const EdgeInsets.all(10),
-                              height: 70,
+                              height: 270,
                               child: TitledWidget(
                                 title: 'Over/Under',
                                 titleFontSize: 14,
-                                content: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                content: Column(
                                   children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: InkResponse(
-                                          splashColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          onTap: isEditing
-                                              ? () {
-                                                  setState(() {
-                                                    editableTip =
-                                                        editableTip.editTip(
-                                                      overUnderTip: editableTip
-                                                          .overUnderTip
-                                                          .abs(),
-                                                    );
-                                                    // editableTip = MatchTip(
-                                                    //     editableTip.home,
-                                                    //     editableTip.away,
-                                                    //     editableTip.time,
-                                                    //     editableTip.winTip,
-                                                    //     editableTip
-                                                    //         .overUnderTip
-                                                    //         .abs(),
-                                                    //     editableTip.gGTip,
-                                                    //     homeRecord: editableTip
-                                                    //         .homeRecord,
-                                                    //     awayRecord: editableTip
-                                                    //         .awayRecord);
-                                                  });
-                                                }
-                                              : null,
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: editableTip
-                                                              .overUnderTip >
-                                                          0
-                                                      ? isEditing
-                                                          ? Colors.lightGreen
-                                                          : Colors.green
-                                                      : Colors.white,
-                                                  boxShadow: const [
-                                                    BoxShadow(
-                                                        color: Colors.grey,
-                                                        offset: Offset(1, 1),
-                                                        blurRadius: 1)
-                                                  ],
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                              child: Center(
-                                                  child: Text(
-                                                      'Over ${(editableTip.overUnderTip.abs())}'))),
-                                        )),
-                                    const VerticalDivider(),
-                                    Expanded(
-                                        flex: 1,
-                                        child: InkResponse(
-                                          splashColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          onTap: isEditing
-                                              ? () {
-                                                  setState(() {
-                                                    editableTip =
-                                                        editableTip.editTip(
-                                                      overUnderTip: editableTip
-                                                              .overUnderTip
-                                                              .abs() *
-                                                          -1,
-                                                    );
-                                                    // editableTip = MatchTip(
-                                                    //     editableTip.home,
-                                                    //     editableTip.away,
-                                                    //     editableTip.time,
-                                                    //     editableTip.winTip,
-                                                    //     editableTip
-                                                    //             .overUnderTip
-                                                    //             .abs() *
-                                                    //         -1,
-                                                    //     editableTip.gGTip,
-                                                    //     homeRecord: editableTip
-                                                    //         .homeRecord,
-                                                    //     awayRecord: editableTip
-                                                    //         .awayRecord);
-                                                  });
-                                                }
-                                              : null,
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: editableTip
-                                                              .overUnderTip <
-                                                          0
-                                                      ? isEditing
-                                                          ? Colors.lightGreen
-                                                          : Colors.green
-                                                      : Colors.white,
-                                                  boxShadow: const [
-                                                    BoxShadow(
-                                                        color: Colors.grey,
-                                                        offset: Offset(1, 1),
-                                                        blurRadius: 1)
-                                                  ],
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                              //color: Colors.green,
-                                              child: Center(
-                                                  child: Text(
-                                                      'Under ${editableTip.overUnderTip.abs()}'))),
-                                        )),
+                                    for (double i = 0.5; i < 5.5; i++)
+                                      Padding(
+                                        padding: const EdgeInsets.all(5),
+                                        child: SizedBox(
+                                          height: 35,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: InkResponse(
+                                                    splashColor:
+                                                        Colors.transparent,
+                                                    highlightColor:
+                                                        Colors.transparent,
+                                                    onTap: isEditing
+                                                        ? () {
+                                                            setState(() {
+                                                              editableTip =
+                                                                  editableTip
+                                                                      .editTip(
+                                                                overUnderTip: i,
+                                                              );
+                                                            });
+                                                          }
+                                                        : null,
+                                                    child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: editableTip
+                                                                            .overUnderTip ==
+                                                                        i
+                                                                    ? isEditing
+                                                                        ? Colors
+                                                                            .lightGreen
+                                                                        : Colors
+                                                                            .green
+                                                                    : Colors
+                                                                        .white,
+                                                                boxShadow: const [
+                                                                  BoxShadow(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      offset:
+                                                                          Offset(
+                                                                              1,
+                                                                              1),
+                                                                      blurRadius:
+                                                                          1)
+                                                                ],
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                        child: Center(
+                                                            child: Text(
+                                                                'Over $i'))),
+                                                  )),
+                                              const VerticalDivider(),
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: InkResponse(
+                                                    splashColor:
+                                                        Colors.transparent,
+                                                    highlightColor:
+                                                        Colors.transparent,
+                                                    onTap: isEditing
+                                                        ? () {
+                                                            setState(() {
+                                                              editableTip =
+                                                                  editableTip
+                                                                      .editTip(
+                                                                overUnderTip:
+                                                                    i * -1,
+                                                              );
+                                                            });
+                                                          }
+                                                        : null,
+                                                    child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: editableTip
+                                                                            .overUnderTip ==
+                                                                        i * -1
+                                                                    ? isEditing
+                                                                        ? Colors
+                                                                            .lightGreen
+                                                                        : Colors
+                                                                            .green
+                                                                    : Colors
+                                                                        .white,
+                                                                boxShadow: const [
+                                                                  BoxShadow(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      offset:
+                                                                          Offset(
+                                                                              1,
+                                                                              1),
+                                                                      blurRadius:
+                                                                          1)
+                                                                ],
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                        //color: Colors.green,
+                                                        child: Center(
+                                                            child: Text(
+                                                                'Under $i'))),
+                                                  )),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
                               )),
