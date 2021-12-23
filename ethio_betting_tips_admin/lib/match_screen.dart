@@ -200,7 +200,7 @@ class _MatchScreenState extends State<MatchScreen> {
                                       ],
                                     ),
                                     const VerticalDivider(),
-                                    const Text('VS'),
+                                    const Text('-'),
                                     const VerticalDivider(),
                                     Stack(
                                       alignment: Alignment.topRight,
@@ -310,7 +310,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                   toggleWidgetList: [
                                                                                     iconTextFor(-1),
                                                                                     iconTextFor(0),
-                                                                                    iconTextFor(1)
+                                                                                    iconTextFor(1),
+                                                                                    iconTextFor(2)
                                                                                   ],
                                                                                   onToggleChange: (index) {
                                                                                     List<int> temp = List.from(editableTip.homeRecord);
@@ -327,7 +328,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.homeRecord);
@@ -343,7 +345,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.homeRecord);
@@ -359,7 +362,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.homeRecord);
@@ -375,7 +379,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.homeRecord);
@@ -403,7 +408,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.awayRecord);
@@ -419,7 +425,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.awayRecord);
@@ -435,7 +442,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.awayRecord);
@@ -451,7 +459,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.awayRecord);
@@ -467,7 +476,8 @@ class _MatchScreenState extends State<MatchScreen> {
                                                                                     toggleWidgetList: [
                                                                                       iconTextFor(-1),
                                                                                       iconTextFor(0),
-                                                                                      iconTextFor(1)
+                                                                                      iconTextFor(1),
+                                                                                      iconTextFor(2)
                                                                                     ],
                                                                                     onToggleChange: (index) {
                                                                                       List<int> temp = List.from(editableTip.awayRecord);

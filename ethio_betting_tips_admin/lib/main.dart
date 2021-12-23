@@ -89,13 +89,33 @@ class _HomePageState extends State<HomePage> {
             drawer: Drawer(
               child: ListView(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                       height: 200,
-                      child: Center(child: Text('Ethio Betting Tips (Admin)'))),
+                      child: Center(
+                          child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 30),
+                              child: SizedBox(
+                                  height: 150,
+                                  child: Image.asset(
+                                    'ethio_betting_tips_admin2048.png',
+                                    fit: BoxFit.fitHeight,
+                                  ))),
+                          const Text('Ethio Betting Tips (Admin)',
+                              style: TextStyle(fontSize: 16)),
+                        ],
+                      ))),
                   const ListTile(
+                    leading: Icon(
+                      Icons.admin_panel_settings,
+                      color: Colors.grey,
+                    ),
                     title: Text(
                       'Add new Admin - (coming soon)',
-                      style: TextStyle(fontStyle: FontStyle.italic),
+                      style: TextStyle(
+                          fontStyle: FontStyle.italic, color: Colors.grey),
                     ),
                     // TODO: Find a stable way to implement this method
                     // onTap: () {
@@ -107,6 +127,7 @@ class _HomePageState extends State<HomePage> {
                   //   title: Text('User Count(50)'),
                   // ),
                   ListTile(
+                      leading: Icon(Icons.logout),
                       onTap: () {
                         api.logout();
                       },

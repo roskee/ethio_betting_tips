@@ -121,8 +121,8 @@ class MatchTip {
     away = 'AwayTeam';
     time = DateTime(
         DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
-    homeRecord = [-1, -1, -1, -1, -1];
-    awayRecord = [-1, -1, -1, -1, -1];
+    homeRecord = [2, 2, 2, 2, 2];
+    awayRecord = [2, 2, 2, 2, 2];
     winTip = 0;
     overUnderTip = 0.5;
     gGTip = false;

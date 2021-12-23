@@ -2,7 +2,7 @@
     package="com.example.ethio_betting_tips_admin">
    <application
         android:label="ethio_betting_tips_admin"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
